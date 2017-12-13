@@ -1,0 +1,14 @@
+.idea/workspace.xml  
+.idea/dictionaries/myj.xml  
+.idea/  
+.DS_Store   
+.settings  
+.target  
+**/.settings   
+**/.eclipse  
+**/target/  
+target/  
+bin/  
+.svn  
+*.iml 
+/bin/
