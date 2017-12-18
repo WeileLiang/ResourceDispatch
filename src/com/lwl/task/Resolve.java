@@ -32,15 +32,14 @@ public class Resolve {
 
 	public static void main(String[] args) {
 		Product product = new Product();
-		JobshopSystem jobshopSystem=new JobshopSystem();
+		JobshopSystem jobshopSystem = new JobshopSystem();
 		TaskGraph.compute(product.getJobs(), product.getTotalStepCount());
 	}
 
-	public static void resolve(JobshopSystem jobshopSystem,Product product) {
-		
+	public static void resolve(JobshopSystem jobshopSystem, Product product) {
+
 	}
-	
-	
+
 	private void initJobs() throws NumberFormatException, IOException {
 		reader = new BufferedReader(new InputStreamReader(new FileInputStream(INIT_FILE_PATH)));
 		int jobsCount = Integer.parseInt(reader.readLine());
@@ -103,14 +102,16 @@ public class Resolve {
 		case 2:
 			if (idCoordinate[1].equals("AND"))
 				type = Step.AND;
-			else
+			else if (idCoordinate[1].equals("OR"))
 				type = Step.OR;
 
 			step = new Step(job, id, type, totalStepCount++);
 			break;
 		default:
-			type = Step.JOIN;
-			step = new Step(job, id, type, totalStepCount++);
+			if (idCoordinate[1].equals("JOIN")) {
+				type = Step.JOIN;
+				step = new Step(job, id, type, totalStepCount++);
+			}
 			break;
 		}
 
