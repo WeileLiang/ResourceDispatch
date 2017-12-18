@@ -56,8 +56,20 @@ public class JobshopSystem {
 
 	}
 
-	private void handleProduct(Jobshop jobshop, Product product) {
+	private boolean handleJob(Jobshop jobshop, Job job) {
+		Set<Step> taboo = new HashSet<>();
+		Set<Step> accessiblePool = new HashSet<>();
 
+		accessiblePool.add(job.getAllSteps().get(0));
+
+		// 最后一个Step为END，当该结点被添加到taboo中，表示该Jobshop能够完成该Job
+		Step end = job.getAllSteps().get(job.getAllSteps().size() - 1);
+
+		while (!taboo.contains(end)) {
+				
+		}
+		
+		return true;
 	}
 
 	public static class Jobshop {

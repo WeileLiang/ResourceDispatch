@@ -154,8 +154,8 @@ public class Ant {
 		for (int i = 0; i < steps.length; i++)
 			changeStepToGeneralType(steps[i]);
 
-		Step[] temps = new Step[accessiblePool.size()];
-		accessiblePool.toArray(temps);
+//		Step[] temps = new Step[accessiblePool.size()];
+//		accessiblePool.toArray(temps);
 		// for (int i = 0; i < temps.length; i++) {
 		// System.out.print(temps[i].getId()+" ");
 		// }

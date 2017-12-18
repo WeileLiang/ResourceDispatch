@@ -24,7 +24,7 @@ public class Step implements Cloneable {
 	public static final int OR = 1; // 或结点
 	public static final int JOIN = 2; // 汇聚结点，多个Step的汇集结点
 	public static final int GENERAL = 3;
-	public static final int END = 4; //结束结点，代表整个组件已经加工完毕
+//	public static final int END = 4; //结束结点，代表整个组件已经加工完毕
 
 	// 步骤的类型
 	private int type = GENERAL;
