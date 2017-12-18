@@ -157,7 +157,7 @@ public class Resource implements Cloneable {
 
 		sb.append('\n');
 
-		return sb.toString();
+		return sb.toString().trim();
 	}
 
 	@Override

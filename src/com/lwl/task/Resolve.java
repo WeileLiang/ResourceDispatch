@@ -32,9 +32,15 @@ public class Resolve {
 
 	public static void main(String[] args) {
 		Product product = new Product();
+		JobshopSystem jobshopSystem=new JobshopSystem();
 		TaskGraph.compute(product.getJobs(), product.getTotalStepCount());
 	}
 
+	public static void resolve(JobshopSystem jobshopSystem,Product product) {
+		
+	}
+	
+	
 	private void initJobs() throws NumberFormatException, IOException {
 		reader = new BufferedReader(new InputStreamReader(new FileInputStream(INIT_FILE_PATH)));
 		int jobsCount = Integer.parseInt(reader.readLine());
