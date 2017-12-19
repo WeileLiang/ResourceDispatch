@@ -133,7 +133,7 @@ public class JobshopSystem {
 					//将该Step的孩子添加到可选池
 					List<Step> children = step.getChildren();
 					if (children != null && !children.isEmpty()) {
-						accessiblePool.add(children);
+						accessiblePool.addAll(children);
 						for (Step child : children)
 							changeStepToGeneralType(taboo, accessiblePool, child);
 					}
