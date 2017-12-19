@@ -34,8 +34,8 @@ public class Resolve {
 		Product product = new Product();
 		JobshopSystem jobshopSystem = new JobshopSystem();
 		
-//		System.out.println(jobshopSystem.handleJob(jobshopSystem.jobshops.get(0), product.getJobs()[0]));
-		TaskGraph.compute(product.getJobs(), product.getTotalStepCount());
+		System.out.println(jobshopSystem.handleJob(jobshopSystem.jobshops.get(1), product.getJobs()[1]));
+//		TaskGraph.compute(product.getJobs(), product.getTotalStepCount());
 	}
 
 	public static void resolve(JobshopSystem jobshopSystem, Product product) {
