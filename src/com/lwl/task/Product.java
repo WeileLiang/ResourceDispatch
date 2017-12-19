@@ -105,7 +105,13 @@ public class Product {
 
 		if (type == Step.JOIN) {// 当结点类型是JOIN时，记录在安排该Step前必须完成的Step
 			List<Step> finishedBeforeDone = new ArrayList<Step>();
-			for (int i = 2; i < idCoordinate.length; i++) {
+			int i = 2;
+			//该结点是跟OR结点对应的JOIN结点，这是为了方便任务分解
+			if(idCoordinate[2].equals("OR")) {
+				i=3;
+				step.isJoinOrStep=true;
+			}
+			for (; i < idCoordinate.length; i++) {
 				int mId = Integer.parseInt(idCoordinate[i]);
 				finishedBeforeDone.add(job.getAllSteps().get(mId));
 			}
