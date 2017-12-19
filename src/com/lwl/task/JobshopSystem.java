@@ -94,6 +94,7 @@ public class JobshopSystem {
 				accessiblePool.addAll(pickStep.getChildren());
 
 			accessiblePool.remove(pickStep);
+			taboo.add(pickStep);
 		}
 
 		return true;
@@ -104,6 +105,7 @@ public class JobshopSystem {
 		accessiblePool.toArray(steps);
 		for (int i = 0; i < steps.length; i++)
 			changeStepToGeneralType(taboo, accessiblePool, steps[i]);
+		
 	}
 
 	public static void changeStepToGeneralType(Set<Step> taboo, Set<Step> accessiblePool, Step step) {
