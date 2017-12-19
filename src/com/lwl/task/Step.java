@@ -38,6 +38,9 @@ public class Step implements Cloneable {
 	private List<Integer> suitableMachines;
 	private List<Integer> finishedTimes;
 
+	//是否跟OR结点对应的JOIN结点
+	public boolean isJoinOrStep=false;
+	
 	public Step(Job job, int id, int type, int graphId) {
 		setId(id);
 		setJob(job);
