@@ -61,14 +61,51 @@ public class JobshopSystem {
 
 	}
 
-	public boolean handleProduct(Product product) {
-		
-		return true;
+	public void handleProduct(Product product) {
+		Way way=null;
+		if((way=handleWholeProduct(product))!=null){
+			TaskGraph.curResource=way.getResource();
+			System.out.println(way);
+		}else{
+			
+		}
+
 	}
-	
-	public Way handleJob(Jobshop jobshop, Job job) {
+
+	/**
+	 * 把每个Product分发到各个Jobshop,看是否有车间能够独立完成
+	 * @param product
+	 * @return
+	 */
+	private Way handleWholeProduct(Product product) {
+		boolean allCannotFinish = true;
+		List<Way> ways = new ArrayList<>();
+
+		for (Jobshop jobshop : jobshops) {
+			boolean canFinish = true;
+			for (Job job : product.getJobs())
+				if (!canHandleJob(jobshop, job))
+					canFinish = false;
+
+			// 该车间能完成整个Product的所有Job
+			if (canFinish)
+				ways.add(TaskGraph.compute(product.getJobs(), product.getTotalStepCount(), jobshop.machineIds));
+		}
+
+		if (ways.isEmpty())
+			return null;
+
+		Way bestWay = ways.get(0);
+		for (int i = 1; i < ways.size(); i++)
+			bestWay = ways.get(i).getTime() < bestWay.getTime() ? ways.get(i) : bestWay;
+
+		return bestWay;
+	}
+
+	public boolean canHandleJob(Jobshop jobshop, Job job) {
+
 		if (jobshop.hasRecord(job))
-			return TaskGraph.compute(new Job[] {job}, job.getAllSteps().size(), jobshop.machineIds);
+			return true;
 
 		Set<Step> taboo = new HashSet<>();
 		Set<Step> accessiblePool = new HashSet<>();
@@ -101,7 +138,7 @@ public class JobshopSystem {
 
 			if (allCannotBeFinished) {
 				jobshop.addFinishRecord(job, false);
-				return null;
+				return false;
 			}
 
 			if (pickStep.getChildren() != null)
@@ -112,7 +149,22 @@ public class JobshopSystem {
 		}
 
 		jobshop.addFinishRecord(job, true);
-		return TaskGraph.compute(new Job[] {job}, job.getAllSteps().size(), jobshop.machineIds);
+		return true;
+
+	}
+
+	/**
+	 * 当车间能够完成该组件任务时，求该组件在此车间的调度方案
+	 * 
+	 * @param jobshop
+	 * @param job
+	 * @return
+	 */
+	public Way getDispatchWay(Jobshop jobshop, Job job) {
+		if (jobshop.hasRecord(job))
+			return TaskGraph.compute(new Job[] { job }, job.getAllSteps().size(), jobshop.machineIds);
+
+		return null;
 
 	}
 

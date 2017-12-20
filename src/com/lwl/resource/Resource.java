@@ -46,8 +46,7 @@ public class Resource implements Cloneable {
 		// startTimer();
 	}
 
-	public Resource(Set<Integer> machineIds) {
-		this();
+	public void setAvailableMachineIds(Set<Integer> machineIds) {
 		if (machineIds != null && !machineIds.isEmpty())
 			availableMachineIds = machineIds;
 		else {
@@ -55,9 +54,8 @@ public class Resource implements Cloneable {
 			for (int i = 0; i < MACHINE_COUNT; i++)
 				availableMachineIds.add(i);
 		}
-
 	}
-
+	
 	private void initMachines() {
 
 		BufferedReader reader = null;
