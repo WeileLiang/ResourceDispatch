@@ -7,7 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.print.attribute.standard.JobSheets;
 
@@ -46,8 +48,7 @@ public class TaskGraph {
 	private BufferedReader reader;
 
 	public TaskGraph() throws IOException {
-		reader = new BufferedReader(new InputStreamReader(new FileInputStream(
-				INIT_FILE_PATH)));
+		reader = new BufferedReader(new InputStreamReader(new FileInputStream(INIT_FILE_PATH)));
 		JOBS_COUNT = Integer.parseInt(reader.readLine());
 		// System.out.println(""+JOBS_COUNT);
 		JOBS_FILE_PATH = new String[JOBS_COUNT];
@@ -63,8 +64,7 @@ public class TaskGraph {
 		// 读取各个Job.txt的信息，转换为对应的图
 		for (int i = 0; i < JOBS_COUNT; i++) {
 			JOBS[i] = new Job(i, jobsName[i]);
-			reader = new BufferedReader(new InputStreamReader(
-					new FileInputStream(JOBS_FILE_PATH[i])));
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(JOBS_FILE_PATH[i])));
 			// 第i个Job的Step总数以及开始时间
 			String[] countAndBeginTime = reader.readLine().split(" ");
 			int stepCount = Integer.parseInt(countAndBeginTime[0]);
@@ -90,10 +90,11 @@ public class TaskGraph {
 	}
 
 	public static int tempTotalStepCount;
-	public TaskGraph(Job[] jobs,int totalStepCount) {
+
+	public TaskGraph(Job[] jobs, int totalStepCount) {
 		JOBS = jobs;
 		JOBS_COUNT = jobs.length;
-		TOTAL_STEP_COUNT=totalStepCount;
+		TOTAL_STEP_COUNT = totalStepCount;
 
 		children = new ArrayList<Step>();
 		for (int i = 0; i < JOBS_COUNT; i++)
@@ -103,36 +104,35 @@ public class TaskGraph {
 		start.setChildren(children);
 	}
 
-//	public static void main(String[] args) throws IOException {
-////		TaskGraph graph = new TaskGraph();
-//		Resolve resolve=new Resolve();
-//		TaskGraph graph = new TaskGraph(resolve.getJobs(),resolve.getTotalStepCount());
-//		Resource initResource = new Resource(null);
-//		ACO aco = new ACO(initResource);
-//		for (int i = 0; i < ACO.MAX_ROUND; i++) {
-//			aco.startNewRound(i);
-//		}
-//
-//		Way bestWay = aco.getBestWay();
-//		System.out.println("Time: " + bestWay.getTime());
-//		System.out.println(bestWay.getResource());
-//	}
-	
+	// public static void main(String[] args) throws IOException {
+	//// TaskGraph graph = new TaskGraph();
+	// Resolve resolve=new Resolve();
+	// TaskGraph graph = new
+	// TaskGraph(resolve.getJobs(),resolve.getTotalStepCount());
+	// Resource initResource = new Resource(null);
+	// ACO aco = new ACO(initResource);
+	// for (int i = 0; i < ACO.MAX_ROUND; i++) {
+	// aco.startNewRound(i);
+	// }
+	//
+	// Way bestWay = aco.getBestWay();
+	// System.out.println("Time: " + bestWay.getTime());
+	// System.out.println(bestWay.getResource());
+	// }
 
-	
-	public static void compute(Job[] jobs, int totalStepCount) {
-		TaskGraph graph=new TaskGraph(jobs,totalStepCount);
-		Resource initResource = new Resource(null);
+	public static Way compute(Job[] jobs, int totalStepCount, Set<Integer> availableMachineIds) {
+		TaskGraph graph = new TaskGraph(jobs, totalStepCount);
+		Resource initResource = new Resource(availableMachineIds);
 		ACO aco = new ACO(initResource);
 		for (int i = 0; i < ACO.MAX_ROUND; i++) {
 			aco.startNewRound(i);
 		}
 
-		Way bestWay = aco.getBestWay();
-		System.out.println("Time: " + bestWay.getTime());
-		System.out.println(bestWay.getResource());
+		return aco.getBestWay();
+		// System.out.println("Time: " + bestWay.getTime());
+		// System.out.println(bestWay.getResource());
 	}
-	
+
 	// 把相连的结点添加到各自的children链表中
 	private void addEdgeToJob(Job job) throws IOException {
 		String line = null;
@@ -141,8 +141,7 @@ public class TaskGraph {
 			Step step = job.getAllSteps().get(Integer.parseInt(coordinate[0]));
 			List<Step> children = new ArrayList<Step>();
 			for (int i = 1; i < coordinate.length; i++)
-				children.add(job.getAllSteps().get(
-						Integer.parseInt(coordinate[i])));
+				children.add(job.getAllSteps().get(Integer.parseInt(coordinate[i])));
 
 			step.setChildren(children);
 			// 如果该Step是OR,那么其儿子结点时互斥的，因此在各个儿子结点保存其他的儿子结点。

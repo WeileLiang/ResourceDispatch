@@ -5,7 +5,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import com.lwl.antcolony.Way;
 
 public class Resolve {
 
@@ -34,12 +38,26 @@ public class Resolve {
 		Product product = new Product();
 		JobshopSystem jobshopSystem = new JobshopSystem();
 		
-		System.out.println(jobshopSystem.handleJob(jobshopSystem.jobshops.get(1), product.getJobs()[1]));
-//		TaskGraph.compute(product.getJobs(), product.getTotalStepCount());
+//		System.out.println(jobshopSystem.handleJob(jobshopSystem.jobshops.get(1), product.getJobs()[0]));
+		Set<Integer> availableMachineIds=new HashSet<>();
+		availableMachineIds.add(4);
+		availableMachineIds.add(5);
+		availableMachineIds.add(8);
+		availableMachineIds.add(9);
+		availableMachineIds.add(10);
+		availableMachineIds.add(11);
+		availableMachineIds.add(13);
+//		availableMachineIds.add(8);
+//		availableMachineIds.add(9);
+//		availableMachineIds.add(10);
+//		availableMachineIds.add(11);
+//		availableMachineIds.add(12);
+		Way bestWay=TaskGraph.compute(product.getJobs(), product.getTotalStepCount(),availableMachineIds);
+		System.out.println(bestWay);
 	}
 
 	public static void resolve(JobshopSystem jobshopSystem, Product product) {
-
+		
 	}
 
 	private void initJobs() throws NumberFormatException, IOException {

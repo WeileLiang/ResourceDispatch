@@ -66,4 +66,13 @@ public class Way {
 		return false;
 	}
 	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		StringBuilder sb=new StringBuilder();
+		sb.append("Time: ").append(time).append('\n');
+		sb.append(resource);
+		
+		return sb.toString();
+	}
 }
