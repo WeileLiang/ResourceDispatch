@@ -37,9 +37,10 @@ public class Resolve {
 	public static void main(String[] args) {
 		Product product = new Product();
 		JobshopSystem jobshopSystem = new JobshopSystem();
-		
-//		System.out.println(jobshopSystem.handleJob(jobshopSystem.jobshops.get(1), product.getJobs()[0]));
-		Set<Integer> availableMachineIds=new HashSet<>();
+
+		// System.out.println(jobshopSystem.handleJob(jobshopSystem.jobshops.get(1),
+		// product.getJobs()[0]));
+		Set<Integer> availableMachineIds = new HashSet<>();
 		availableMachineIds.add(4);
 		availableMachineIds.add(5);
 		availableMachineIds.add(8);
@@ -47,17 +48,20 @@ public class Resolve {
 		availableMachineIds.add(10);
 		availableMachineIds.add(11);
 		availableMachineIds.add(13);
-//		availableMachineIds.add(8);
-//		availableMachineIds.add(9);
-//		availableMachineIds.add(10);
-//		availableMachineIds.add(11);
-//		availableMachineIds.add(12);
-		Way bestWay=TaskGraph.compute(product.getJobs(), product.getTotalStepCount(),availableMachineIds);
+		// availableMachineIds.add(8);
+		// availableMachineIds.add(9);
+		// availableMachineIds.add(10);
+		// availableMachineIds.add(11);
+		// availableMachineIds.add(12);
+		Way bestWay = TaskGraph.compute(product.getJobs(), product.getTotalStepCount(), availableMachineIds);
 		System.out.println(bestWay);
+
+//		System.out.println();
+//		System.out.println(TaskGraph.curResource);
 	}
 
 	public static void resolve(JobshopSystem jobshopSystem, Product product) {
-		
+
 	}
 
 	private void initJobs() throws NumberFormatException, IOException {

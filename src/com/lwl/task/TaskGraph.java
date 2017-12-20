@@ -119,11 +119,13 @@ public class TaskGraph {
 	// System.out.println("Time: " + bestWay.getTime());
 	// System.out.println(bestWay.getResource());
 	// }
-
+	
+	public static Resource curResource=new Resource();
+	
 	public static Way compute(Job[] jobs, int totalStepCount, Set<Integer> availableMachineIds) {
 		TaskGraph graph = new TaskGraph(jobs, totalStepCount);
-		Resource initResource = new Resource(availableMachineIds);
-		ACO aco = new ACO(initResource);
+		curResource.setAvailableMachineIds(availableMachineIds);
+		ACO aco = new ACO(curResource);
 		for (int i = 0; i < ACO.MAX_ROUND; i++) {
 			aco.startNewRound(i);
 		}
