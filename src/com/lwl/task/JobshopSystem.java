@@ -8,9 +8,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import com.lwl.antcolony.Way;
 
 public class JobshopSystem {
 	public static final String JOBSHOP_PATH = ".\\jobshops.txt";
@@ -57,7 +61,15 @@ public class JobshopSystem {
 
 	}
 
-	public boolean handleJob(Jobshop jobshop, Job job) {
+	public boolean handleProduct(Product product) {
+		
+		return true;
+	}
+	
+	public Way handleJob(Jobshop jobshop, Job job) {
+		if (jobshop.hasRecord(job))
+			return TaskGraph.compute(new Job[] {job}, job.getAllSteps().size(), jobshop.machineIds);
+
 		Set<Step> taboo = new HashSet<>();
 		Set<Step> accessiblePool = new HashSet<>();
 
@@ -87,8 +99,10 @@ public class JobshopSystem {
 
 			}
 
-			if (allCannotBeFinished)
-				return false;
+			if (allCannotBeFinished) {
+				jobshop.addFinishRecord(job, false);
+				return null;
+			}
 
 			if (pickStep.getChildren() != null)
 				accessiblePool.addAll(pickStep.getChildren());
@@ -97,7 +111,9 @@ public class JobshopSystem {
 			taboo.add(pickStep);
 		}
 
-		return true;
+		jobshop.addFinishRecord(job, true);
+		return TaskGraph.compute(new Job[] {job}, job.getAllSteps().size(), jobshop.machineIds);
+
 	}
 
 	public static void changeAll2General(Set<Step> taboo, Set<Step> accessiblePool) {
@@ -105,7 +121,7 @@ public class JobshopSystem {
 		accessiblePool.toArray(steps);
 		for (int i = 0; i < steps.length; i++)
 			changeStepToGeneralType(taboo, accessiblePool, steps[i]);
-		
+
 	}
 
 	public static void changeStepToGeneralType(Set<Step> taboo, Set<Step> accessiblePool, Step step) {
@@ -131,8 +147,8 @@ public class JobshopSystem {
 					// 移除所有约束结点，减少计算量
 					accessiblePool.removeAll(step.getFinishedBeforeDone());
 					taboo.add(step);
-					
-					//将该Step的孩子添加到可选池
+
+					// 将该Step的孩子添加到可选池
 					List<Step> children = step.getChildren();
 					if (children != null && !children.isEmpty()) {
 						accessiblePool.addAll(children);
@@ -171,10 +187,25 @@ public class JobshopSystem {
 	public static class Jobshop {
 		String name;
 		Set<Integer> machineIds;
+		// 记录哪些Job是该车间能够完成
+		Map<Job, Boolean> canFinishMap;
 
 		public Jobshop(String name, Set<Integer> ids) {
 			this.name = name;
 			machineIds = ids;
+			canFinishMap = new HashMap<>();
+		}
+
+		void addFinishRecord(Job job, boolean canFinish) {
+			canFinishMap.put(job, canFinish);
+		}
+
+		boolean hasRecord(Job job) {
+			return canFinishMap.containsKey(job);
+		}
+
+		boolean getRecord(Job job) {
+			return canFinishMap.get(job);
 		}
 	}
 }

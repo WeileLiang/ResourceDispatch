@@ -8,8 +8,10 @@ import java.io.InputStreamReader;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,63 +28,76 @@ public class Resource implements Cloneable {
 	// 计时器
 	private Timer timer;
 	private TimerTask task;
-	
-	public static final String INIT_MACHINE_PATH="initMachine.txt";
+
+	public static final String INIT_MACHINE_PATH = "initMachine.txt";
 
 	// 资源集合
 	private List<Machine> machines;
+	// 可用的设备集合，即只在该集合的设备上进行调度
+	private Set<Integer> availableMachineIds;
 	// 计时器计时的时间间隔
 	public static final int PERIOD = 1000;
 
 	public static final int MACHINE_COUNT = 16;
 
-	public Resource(List<Machine> machines) {
+	public Resource() {
 		// setMachines(machines);
-		initMachines(); 
+		initMachines();
 		// startTimer();
 	}
 
+	public Resource(Set<Integer> machineIds) {
+		this();
+		if (machineIds != null && !machineIds.isEmpty())
+			availableMachineIds = machineIds;
+		else {
+			availableMachineIds=new HashSet<>();
+			for (int i = 0; i < MACHINE_COUNT; i++)
+				availableMachineIds.add(i);
+		}
+
+	}
+
 	private void initMachines() {
-		
-		BufferedReader reader=null;
+
+		BufferedReader reader = null;
 		try {
-			reader=new BufferedReader(new InputStreamReader(new FileInputStream(
-					INIT_MACHINE_PATH)));
-			//需要初始化的设备数量
-			int initMachineCount=Integer.parseInt(reader.readLine());
-			//保存需要初始化的设备的工序
-			Map<Integer, List<TimeChip>> chipsOfInitMachines=new HashMap<Integer, List<TimeChip>>();
-			
-			int idOfInitStep=0;
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(INIT_MACHINE_PATH)));
+			// 需要初始化的设备数量
+			int initMachineCount = Integer.parseInt(reader.readLine());
+			// 保存需要初始化的设备的工序
+			Map<Integer, List<TimeChip>> chipsOfInitMachines = new HashMap<Integer, List<TimeChip>>();
+
+			int idOfInitStep = 0;
 			for (int i = 0; i < initMachineCount; i++) {
-				//空行
+				// 空行
 				reader.readLine();
-				
-				String[] idAndNumber=reader.readLine().split(" ");
-				//需要初始化的设备编号(1-15)
-				int machineId=Integer.parseInt(idAndNumber[0]);
-				//这个需要设备初始有多少个工序
-				int numberOfChips=Integer.parseInt(idAndNumber[1]);
-				
-				//保存该设备上初始的工序
-				List<TimeChip> chipsOfMachine=new ArrayList<TimeChip>();
+
+				String[] idAndNumber = reader.readLine().split(" ");
+				// 需要初始化的设备编号(1-15)
+				int machineId = Integer.parseInt(idAndNumber[0]);
+				// 这个需要设备初始有多少个工序
+				int numberOfChips = Integer.parseInt(idAndNumber[1]);
+
+				// 保存该设备上初始的工序
+				List<TimeChip> chipsOfMachine = new ArrayList<TimeChip>();
 				for (int j = 0; j < numberOfChips; j++) {
-					//每行代表一个时间片
-					String[] chip=reader.readLine().split(" ");
-					int start=Integer.parseInt(chip[0]);
-					int end=Integer.parseInt(chip[1]);
-					chipsOfMachine.add(new TimeChip(start, end, new Step(new Job(-1, -1), idOfInitStep++, Step.GENERAL, 0)));
+					// 每行代表一个时间片
+					String[] chip = reader.readLine().split(" ");
+					int start = Integer.parseInt(chip[0]);
+					int end = Integer.parseInt(chip[1]);
+					chipsOfMachine
+							.add(new TimeChip(start, end, new Step(new Job(-1, -1), idOfInitStep++, Step.GENERAL, 0)));
 				}
-				//id为machineId的设备对应的初始时间片
+				// id为machineId的设备对应的初始时间片
 				chipsOfInitMachines.put(machineId, chipsOfMachine);
 			}
-			
+
 			machines = new ArrayList<Machine>();
 			for (int i = 0; i < MACHINE_COUNT; i++) {
 				machines.add(new Machine(i, chipsOfInitMachines.get(i)));
 			}
-			
-			
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -93,10 +108,8 @@ public class Resource implements Cloneable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 
-//		machines.get(1).getChips().add(new TimeChip(0, 8, null));
+		// machines.get(1).getChips().add(new TimeChip(0, 8, null));
 	}
 
 	private void startTimer() {
@@ -146,6 +159,10 @@ public class Resource implements Cloneable {
 
 	public List<Machine> getMachines() {
 		return machines;
+	}
+	
+	public Set<Integer> getAvailableMachineIds() {
+		return availableMachineIds;
 	}
 
 	@Override

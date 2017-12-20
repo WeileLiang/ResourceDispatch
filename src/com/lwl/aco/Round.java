@@ -26,8 +26,7 @@ public class Round {
 	// 本轮结束后信息素增量
 	private double[][] detaPhe;
 
-	// 本轮选出来的最佳路径
-	// private Resource mResource;
+	private Resource mResource;
 
 	// 本轮生成的蚁群
 	private AntColony antColony;
@@ -50,13 +49,13 @@ public class Round {
 
 	public Round(ACO aco, Resource resource) {
 		this.aco = aco;
+		this.mResource = resource;
 		antColony = new AntColony(resource);
 
 		detaPhe = new double[TaskGraph.TOTAL_STEP_COUNT][TaskGraph.TOTAL_STEP_COUNT];
 
 		while (!allAntsFinished()) {
 
-			
 			for (int i = 0; i < AntColony.ANT_COUNT; i++) {
 				if (antColony.getKthAnt(i).isAccessiblePoolEmpty())
 					continue;
@@ -67,12 +66,9 @@ public class Round {
 				if (map == null)
 					continue;
 
-				Step nextStep = TaskGraph.JOBS[map.getJobId()].getAllSteps()
-						.get(map.getStepId());
-				Machine machine = ant.getResource().getMachines()
-						.get(map.getMachineId());
-				double finishedTime = machine.getFinishedTimeAndInsertTimeChip3(
-						map, ant);
+				Step nextStep = TaskGraph.JOBS[map.getJobId()].getAllSteps().get(map.getStepId());
+				Machine machine = ant.getResource().getMachines().get(map.getMachineId());
+				double finishedTime = machine.getFinishedTimeAndInsertTimeChip3(map, ant);
 
 				// 下一步要走的就是nextStep
 				ant.setCurrStep(nextStep);
@@ -87,8 +83,7 @@ public class Round {
 				// 记录Step对应的Job的上个Step完成时间
 				ant.setLastFinishedTimeForOneJob(nextStep, finishedTime);
 				// 如果该Step有orBrothers链表，说明选择了该Step后，其他orBrother就要从备选池中删除
-				if (nextStep.getOrBrothers() != null
-						&& nextStep.getOrBrothers().size() > 0)
+				if (nextStep.getOrBrothers() != null && nextStep.getOrBrothers().size() > 0)
 					for (Step orBrother : nextStep.getOrBrothers()) {
 						ant.getAccessiblePool().remove(orBrother);
 						ant.addToTaboo(orBrother);
@@ -100,13 +95,10 @@ public class Round {
 					ant.getAccessiblePool().addAll(children);
 					// 更新nextStep的孩子最早的开始执行时间
 					for (Step child : children) {
-						Double beginTimeOfChild = ant.getStartStepAfterTime()
-								.get(child);
-						//如果child的最早开始时间不存在，或者比parent的结束时刻早，就更新其最早开始时间
-						if (beginTimeOfChild == null
-								|| beginTimeOfChild < finishedTime)
-							ant.getStartStepAfterTime()
-									.put(child, finishedTime);
+						Double beginTimeOfChild = ant.getStartStepAfterTime().get(child);
+						// 如果child的最早开始时间不存在，或者比parent的结束时刻早，就更新其最早开始时间
+						if (beginTimeOfChild == null || beginTimeOfChild < finishedTime)
+							ant.getStartStepAfterTime().put(child, finishedTime);
 					}
 				}
 
@@ -135,8 +127,7 @@ public class Round {
 			// 如果该蚂蚁是产出最佳路径的蚂蚁，即该蚂蚁的路径是本轮最佳路径。同时，之前已经筛选出了最佳路径
 			if (i == bestAntId && aco.getBestWay() != null) {
 				// 本轮最佳路径耗费的时间比之前的少，并且两条最佳路径是不同的，那么增加的信息素加倍
-				if (bestWay.getTime() <= aco.getBestWay().getTime()
-						&& !bestWay.equals(aco.getBestWay()))
+				if (bestWay.getTime() <= aco.getBestWay().getTime() && !bestWay.equals(aco.getBestWay()))
 					averagePhe *= 2;
 			}
 
@@ -175,10 +166,12 @@ public class Round {
 			// System.out.println(step.toString());
 			List<StepMapMachine> list = new ArrayList<StepMapMachine>();
 
-			for (int j = 0; j < step.getSuitableMachines().size(); j++)
-				// 表示Job的Step可以在哪个设备上完成
-				list.add(new StepMapMachine(step.getJob().getId(),
-						step.getId(), step.getSuitableMachines().get(j)));
+			for (int j = 0; j < step.getSuitableMachines().size(); j++) {
+				if (mResource.getAvailableMachineIds().contains(step.getSuitableMachines().get(j)))
+					// 表示Job的Step可以在哪个设备上完成
+					list.add(
+							new StepMapMachine(step.getJob().getId(), step.getId(), step.getSuitableMachines().get(j)));
+			}
 
 			lists.add(list);
 		}
@@ -203,13 +196,9 @@ public class Round {
 
 			for (int j = 0; j < list.size(); j++) {
 				StepMapMachine map = list.get(j);
-				Step step = TaskGraph.JOBS[map.getJobId()].getAllSteps().get(
-						map.getStepId());
-				Machine machine = ant.getResource().getMachines()
-						.get(map.getMachineId());
-				double T = machine
-						.getFinishedTime3(map,
-								ant.getStartStepAfterTime().get(step),ant);
+				Step step = TaskGraph.JOBS[map.getJobId()].getAllSteps().get(map.getStepId());
+				Machine machine = ant.getResource().getMachines().get(map.getMachineId());
+				double T = machine.getFinishedTime3(map, ant.getStartStepAfterTime().get(step), ant);
 
 				// denumerators.add(list.size() * T);
 				// numerator += T;
@@ -226,8 +215,7 @@ public class Round {
 
 			// 计算各种情况的eta
 			for (int j = 0; j < mNumerators.size(); j++) {
-				double eta = mQ
-						* (mB / list.size() + mNumerators.get(j) / mDenumerator);
+				double eta = mQ * (mB / list.size() + mNumerators.get(j) / mDenumerator);
 
 				etas.add(eta);
 			}
@@ -241,11 +229,8 @@ public class Round {
 
 		for (int i = 0; i < ups.length; i++) {
 			StepMapMachine map = maps.get(i);
-			Step toStep = TaskGraph.JOBS[map.getJobId()].getAllSteps().get(
-					map.getStepId());
-			ups[i] = Math.pow(
-					aco.getPheromone()[ant.getCurrStep().getGraphId()][toStep
-							.getGraphId()], ALPHA)
+			Step toStep = TaskGraph.JOBS[map.getJobId()].getAllSteps().get(map.getStepId());
+			ups[i] = Math.pow(aco.getPheromone()[ant.getCurrStep().getGraphId()][toStep.getGraphId()], ALPHA)
 					* Math.pow(etas.get(i), BETA);
 
 			down += ups[i];
